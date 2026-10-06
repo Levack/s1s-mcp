@@ -1,0 +1,27 @@
+[tools]
+node = "24.13.0"
+pnpm = "10.28.2"
+bun = "1.3.14"
+gitleaks = "8.30.1"
+pre-commit = "4.6.2"
+actionlint = "1.7.12"
+zizmor = "1.30.1"
+
+[tasks.dev-setup]
+description = "Install dependencies and Git pre-commit hooks"
+run = ["pnpm install --frozen-lockfile", "pre-commit install"]
+
+[tasks.serve]
+description = "Build and start the localhost HTTP MCP server"
+run = ["pnpm build", "node dist/cli.js --transport http"]
+raw = true
+
+[tasks.login]
+description = "Authorize OpenRouter via OAuth PKCE"
+run = "pnpm exec tsx src/cli.ts login"
+raw = true
+
+[tasks.logout]
+description = "Remove locally saved OpenRouter credentials"
+run = "pnpm exec tsx src/cli.ts logout"
+raw = true

@@ -1,0 +1,10 @@
+{
+  "state": {
+    "contents": "Use Authorization: Bearer YOUR_API_KEY."
+  },
+  "questions": {
+    "relevant": {
+      "instructions": "Does this explain API authentication?"
+    }
+  }
+}

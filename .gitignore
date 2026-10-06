@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.s1s/
+.s1s-mcp/
+coverage/
+*.tgz

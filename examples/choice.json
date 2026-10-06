@@ -1,0 +1,15 @@
+{
+  "state": {
+    "contents": "Rotate API keys in the authentication settings."
+  },
+  "questions": {
+    "category": {
+      "instructions": "Which context category does this passage belong to?",
+      "criteria": {
+        "auth": "Authentication and API keys",
+        "billing": "Invoices and payments",
+        "other": null
+      }
+    }
+  }
+}

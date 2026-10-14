@@ -69,7 +69,7 @@ jobs:
           if [[ -n "$NODE_AUTH_TOKEN" ]]; then
             printf '%s\n' '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}' > "$NPM_CONFIG_USERCONFIG"
           fi
-          packages=(package-artifact/*.tgz)
+          packages=(./package-artifact/*.tgz)
           test "${#packages[@]}" -eq 1
           test -f "${packages[0]}"
           npm publish "${packages[0]}" --ignore-scripts --access public --provenance --registry=https://registry.npmjs.org/ --tag "$NPM_DIST_TAG"

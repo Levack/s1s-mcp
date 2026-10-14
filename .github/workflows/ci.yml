@@ -63,12 +63,7 @@ jobs:
       - name: Publish verified tarball with npm trusted publishing
         env:
           NPM_DIST_TAG: ${{ inputs.dist-tag }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/npm-publish.npmrc
         run: |
-          if [[ -n "$NODE_AUTH_TOKEN" ]]; then
-            printf '%s\n' "//registry.npmjs.org/:_authToken=\${NODE_AUTH_TOKEN}" > "$NPM_CONFIG_USERCONFIG"
-          fi
           packages=(./package-artifact/*.tgz)
           test "${#packages[@]}" -eq 1
           test -f "${packages[0]}"

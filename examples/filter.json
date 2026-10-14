@@ -1,0 +1,9 @@
+{
+  "question": "Does this text explain bearer token API authentication?",
+  "texts": [
+    {"id": "auth", "content": "Set the Authorization header to Bearer followed by your API key."},
+    {"id": "cooking", "content": "Boil pasta in salted water for ten minutes."}
+  ],
+  "threshold": 0.5,
+  "topK": 5
+}

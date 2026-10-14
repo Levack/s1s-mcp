@@ -1,6 +1,6 @@
 {
   "name": "@levack/s1s-mcp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Local System One search MCP: parallel probabilistic context filtering with Jev",
   "type": "module",
   "bin": {
@@ -20,9 +20,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:live": "tsx scripts/live.ts",
-    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm typecheck && pnpm benchmark:typecheck && pnpm test && pnpm build",
     "prepack": "npm run build",
-    "test:package": "node scripts/package-smoke.mjs"
+    "test:package": "node scripts/package-smoke.mjs",
+    "benchmark:typecheck": "tsc -p benchmark/tsconfig.json"
   },
   "dependencies": {
     "@inquirer/prompts": "^8.7.3",
@@ -31,6 +32,7 @@
     "commander": "^15.0.0",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
+    "ignore": "^7.0.12",
     "open": "^11.0.4",
     "p-limit": "^7.3.3",
     "zod": "^4.6.5"
@@ -38,6 +40,8 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.4",
+    "hyparquet": "^1.31.2",
+    "hyparquet-compressors": "^1.1.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.3"

@@ -5,13 +5,19 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      dist-tag:
+        description: npm distribution tag
+        type: choice
+        options: [latest, next]
+        default: latest
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 jobs:
   verify:
@@ -33,3 +39,37 @@ jobs:
           path: .s1s/*.tgz
           if-no-files-found: error
           retention-days: 7
+
+  publish:
+    name: Publish npm package
+    needs: verify
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+        with:
+          cache: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: s1s-mcp-package
+          path: package-artifact
+      - name: Publish verified tarball with npm trusted publishing
+        env:
+          NPM_DIST_TAG: ${{ inputs.dist-tag }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/npm-publish.npmrc
+        run: |
+          if [[ -n "$NODE_AUTH_TOKEN" ]]; then
+            printf '%s\n' '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}' > "$NPM_CONFIG_USERCONFIG"
+          fi
+          packages=(package-artifact/*.tgz)
+          test "${#packages[@]}" -eq 1
+          test -f "${packages[0]}"
+          npm publish "${packages[0]}" --ignore-scripts --access public --provenance --registry=https://registry.npmjs.org/ --tag "$NPM_DIST_TAG"

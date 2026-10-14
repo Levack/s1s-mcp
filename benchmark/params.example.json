@@ -1,0 +1,14 @@
+{
+  "model": "qwen/qwen3-coder-next",
+  "limit": 50,
+  "repetitions": 1,
+  "maxSteps": 60,
+  "timeoutSeconds": 1200,
+  "output": "benchmark/results/qwen-paired",
+  "s1s": {
+    "provider": "openrouter",
+    "model": "jev-latest",
+    "concurrency": 4,
+    "batchSize": 8
+  }
+}

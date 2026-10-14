@@ -15,7 +15,7 @@ export const configSchema = z.object({
   roots: z.array(z.string().min(1)).min(1).default([process.cwd()]),
   concurrency: z.coerce.number().int().min(1).max(32).default(4),
   batchSize: z.coerce.number().int().min(1).max(64).default(8),
-  maxBatchBytes: z.coerce.number().int().min(1024).max(100000).default(48000),
+  maxBatchBytes: z.coerce.number().int().min(1024).max(200000).default(48000),
   maxFileBytes: z.coerce.number().int().min(1).max(100000).default(24000),
   timeout: z.coerce.number().int().min(100).max(300000).default(30000),
   retries: z.coerce.number().int().min(0).max(5).default(1),

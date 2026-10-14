@@ -62,7 +62,7 @@ try {
   try {
     assert.equal(client.getServerVersion()?.version, manifest.version);
     const tools = await client.listTools();
-    assert.deepEqual(tools.tools.map(tool => tool.name), ['noul', 'score', 'choice', 'rank_candidates']);
+    assert.deepEqual(tools.tools.map(tool => tool.name), ['search_code', 'search_file_contents', 'search_file_names', 'evaluate_boolean', 'evaluate_score']);
     const configuration = await client.readResource({ uri: 's1s://configuration' });
     const effective = JSON.parse(configuration.contents[0].text);
     assert.deepEqual(effective.roots, [temporary]);

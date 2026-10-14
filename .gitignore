@@ -1,9 +1,19 @@
+# Dependencies and build artifacts
 node_modules/
-dist/
+/dist/
+/coverage/
+*.tgz
+
+# Local environment and credentials
 .env
 .env.*
 !.env.example
-.s1s/
-.s1s-mcp/
-coverage/
-*.tgz
+/.s1s/
+/.s1s-mcp/
+
+# Benchmark environment and outputs
+/benchmark/results/
+
+# Python bytecode from benchmark helpers
+__pycache__/
+*.py[cod]

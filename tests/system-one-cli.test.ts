@@ -5,7 +5,7 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-it('evaluates injected JSON through CLI stdin and an explicit request file', async () => {
+it('runs filter and classify requests from CLI stdin and an explicit request file', async () => {
   const received: Record<string, unknown>[] = [];
   const provider = createServer(async (req, res) => {
     let body = '';
@@ -38,12 +38,12 @@ it('evaluates injected JSON through CLI stdin and an explicit request file', asy
     return JSON.parse(stdout);
   };
   try {
-    const state = { contents: '認証情報の説明', path: '/nonexistent', url: 'https://invalid.invalid/' };
-    expect(await run(['noul'], JSON.stringify({ state, questions: { q: {} } }))).toMatchObject({ answers: { q: { noul: 0.8 } } });
+    const texts = [{ id: 'keys', content: '認証情報の説明' }];
+    expect(await run(['filter'], JSON.stringify({ question: 'Is this about authentication?', texts }))).toMatchObject({ results: [{ id: 'keys', probability: 0.8 }] });
     const requestFile = path.join(directory, 'request.json');
-    await writeFile(requestFile, JSON.stringify({ state, questions: { category: { criteria: { auth: 'Authentication', other: null } } } }));
-    expect(await run(['choice', requestFile])).toMatchObject({ answers: { category: { choice: 'auth' } } });
-    expect(received.map(request => request.state)).toEqual([state, state]);
+    await writeFile(requestFile, JSON.stringify({ question: 'Which area?', options: { auth: 'Authentication', other: 'Anything else' }, texts }));
+    expect(await run(['classify', requestFile])).toMatchObject({ groups: { auth: [{ id: 'keys', probability: 1 }], other: [] } });
+    expect(received.map(request => (request.state as { items: { content: string }[] }).items[0]!.content)).toEqual(['認証情報の説明', '認証情報の説明']);
   } finally {
     provider.closeAllConnections();
     await new Promise<void>(resolve => provider.close(() => resolve()));

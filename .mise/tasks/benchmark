@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#MISE raw=true
+#MISE description="Compare LLMs with and without s1s MCP"
+#USAGE flag "--bench <name>" help="swe-bench-mini or loc-bench"
+#USAGE flag "--interactive" help="Choose settings interactively"
+#USAGE flag "--model <id>" help="OpenRouter solver model ID"
+#USAGE flag "--range <numbers>" help="Task numbers, 1-based inclusive: 1-10 or 1,3,5-8"
+#USAGE flag "--instance-ids <ids>" help="Comma-separated problem IDs"
+#USAGE flag "--limit <n>" help="Number of tasks (Mini: 50; Loc-Bench: 560)"
+#USAGE flag "--max-steps <n>" help="Maximum solver calls per attempt"
+#USAGE flag "--max-output-tokens <n>" help="Maximum output tokens per solver call"
+#USAGE flag "--concurrency <n>" help="Parallel task pairs (default: 1)"
+#USAGE flag "--repetitions <n>" help="Paired repetitions"
+#USAGE flag "--timeout-seconds <n>" help="Solving time limit per attempt"
+#USAGE flag "--output <directory>" help="Results directory"
+#USAGE flag "--base-url <url>" help="Chat Completions API root"
+#USAGE flag "--s1s-model <id>" help="System One model ID"
+#USAGE flag "--s1s-provider <name>" help="System One provider (openrouter)"
+#USAGE flag "--mode <mode>" help="run, prepare, or report"
+#USAGE flag "--params <json_or_file>" help="Optional JSON configuration"
+#USAGE flag "--dry-run" help="Simulate the pipeline without Docker or API calls"
+set -euo pipefail
+cd "${MISE_PROJECT_ROOT:-$(dirname "$0")/../..}"
+args=()
+for key in bench model range instance_ids limit max_steps max_output_tokens concurrency repetitions timeout_seconds output base_url s1s_model s1s_provider mode params; do
+  variable="usage_${key}"
+  value="${!variable:-}"
+  if [[ -n "$value" ]]; then args+=("--${key//_/-}" "$value"); fi
+done
+if [[ "${usage_interactive:-false}" == true ]]; then args+=(--interactive); fi
+if [[ "${usage_dry_run:-false}" == true ]]; then args+=(--dry-run); fi
+exec node --import tsx benchmark/cli.ts "${args[@]}"

@@ -25,3 +25,8 @@ raw = true
 description = "Remove locally saved OpenRouter credentials"
 run = "pnpm exec tsx src/cli.ts logout"
 raw = true
+
+[tasks.login-openrouter]
+description = "Authorize OpenRouter for the solver and s1s benchmark"
+run = "pnpm exec tsx src/cli.ts login --provider openrouter --auth-method oauth"
+raw = true

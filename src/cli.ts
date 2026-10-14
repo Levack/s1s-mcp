@@ -6,10 +6,10 @@ import { readFile } from 'node:fs/promises';
 import { loadConfig, storagePaths, readJson, savePrivateJson, publicConfig } from './config.js';
 import { loginOpenRouter } from './oauth.js';
 import { startStdio, startHttp } from './server.js';
-import { Ranker } from './rank.js';
-import { SystemOne, safeError, type Primitive } from './system-one.js';
+import { Screener } from './screen.js';
+import { safeError } from './system-one.js';
 
-const program = new Command().name('s1s-mcp').version(version).description('Filter and rank client-acquired context with System One');
+const program = new Command().name('s1s-mcp').version(version).description('Judge many files or texts at once with System One: filter, rate, classify');
 const configOptions = () => ({ ...program.opts(), baseURL: program.opts().baseUrl, envFile: program.opts().dotenv });
 program
   .option('--config <file>', 'Explicit JSON configuration file')
@@ -23,10 +23,10 @@ program
   .addOption(new Option('--transport <name>', 'MCP transport').choices(['stdio', 'http']))
   .option('--host <host>', 'Loopback bind address')
   .option('--port <number>', 'HTTP port')
-  .option('--roots <paths...>', 'Allowed file roots for the direct rank command')
+  .option('--roots <paths...>', 'Roots that file patterns are resolved against and confined to')
   .option('--concurrency <number>', 'Maximum concurrent model calls')
-  .option('--batch-size <number>', 'Maximum candidates per request')
-  .option('--max-file-bytes <number>', 'Maximum UTF-8 candidate size')
+  .option('--batch-size <number>', 'Maximum files or text parts per request')
+  .option('--max-file-bytes <number>', 'Maximum UTF-8 bytes per judged part; larger files are split')
   .option('--max-batch-bytes <number>', 'Maximum encoded provider request size')
   .option('--timeout <ms>', 'Timeout per model attempt')
   .option('--retries <number>', 'Retry limit')
@@ -85,19 +85,8 @@ program.command('logout').description('Remove saved credentials for the selected
   }
   console.error(`Locally saved ${provider} credentials removed from ${credentials}. Environment and config API keys still apply; revoke the provider key to invalidate it.`);
 });
-program.command('rank <json-file>').description('Run a ranking request directly from JSON').action(async file => {
-  const config = await loadConfig(configOptions());
-  const controller = new AbortController();
-  const cancel = () => controller.abort();
-  process.once('SIGINT', cancel);
-  try {
-    const result = await new Ranker(config).rank(JSON.parse(await readFile(file, 'utf8')), controller.signal);
-    console.log(JSON.stringify(result, null, 2));
-    if (result.errors.length) process.exitCode = 1;
-  } finally { process.off('SIGINT', cancel); }
-});
-for (const type of ['noul', 'score', 'choice'] as const satisfies readonly Primitive[]) {
-  program.command(`${type} [json-file]`).description(`Evaluate ${type} questions from JSON; omit the file or use - for stdin`)
+for (const [type, summary] of [['filter', 'yes/no'], ['rate', 'ordered-scale'], ['classify', 'category']] as const) {
+  program.command(`${type} [json-file]`).description(`Run a ${summary} judgment over files or texts from JSON; omit the file or use - for stdin`)
     .action(async (file = '-') => {
       const config = await loadConfig(configOptions());
       const controller = new AbortController();
@@ -107,13 +96,11 @@ for (const type of ['noul', 'score', 'choice'] as const satisfies readonly Primi
         let text = '';
         if (file === '-') {
           process.stdin.setEncoding('utf8');
-          for await (const chunk of process.stdin) {
-            text += chunk.toString();
-            if (Buffer.byteLength(text) > config.maxBatchBytes) throw new Error('Input exceeds maxBatchBytes');
-          }
+          for await (const chunk of process.stdin) text += chunk.toString();
         } else text = await readFile(file, 'utf8');
-        const result = await new SystemOne(config).run(type, JSON.parse(text), controller.signal);
+        const result = await new Screener(config)[type](JSON.parse(text), controller.signal);
         console.log(JSON.stringify(result, null, 2));
+        if (result.errors.length) process.exitCode = 1;
       } finally { process.off('SIGINT', cancel); }
     });
 }

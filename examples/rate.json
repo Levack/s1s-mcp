@@ -1,0 +1,8 @@
+{
+  "question": "Is this text closer to user-facing documentation or to internal implementation notes?",
+  "levels": ["Clearly user documentation", "Leans user documentation", "Leans implementation notes", "Clearly implementation notes"],
+  "texts": [
+    {"id": "guide", "content": "To get started, run the installer and sign in with your account."},
+    {"id": "notes", "content": "The retry loop backs off exponentially; jitter is drawn per attempt to avoid thundering herds."}
+  ]
+}

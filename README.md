@@ -72,18 +72,7 @@ Check the connection with `opencode mcp list`. See the [OpenCode MCP docs](https
 }
 ```
 
-## MCP tools
-
-- `rank_candidates`: filter and rank candidate contents for a search purpose.
-- `noul`: evaluate yes/no probabilities.
-- `score`: evaluate ordered rubrics.
-- `choice`: classify context into named categories.
-
-Read files or fetch pages with your coding CLI, then pass their contents to MCP.
-
 ## Other commands
-
-Prepare requests using the [Noul](examples/noul.json), [Score](examples/score.json), and [Choice](examples/choice.json) examples.
 
 ```sh
 # Print effective configuration without secrets.
@@ -93,11 +82,6 @@ npx --yes @levack/s1s-mcp@latest config
 npx --yes @levack/s1s-mcp@latest logout --provider openrouter
 npx --yes @levack/s1s-mcp@latest logout --provider typesafe
 
-# Evaluate injected contents from a JSON request file or stdin.
-npx --yes @levack/s1s-mcp@latest noul noul.json
-npx --yes @levack/s1s-mcp@latest score score.json
-npx --yes @levack/s1s-mcp@latest choice choice.json
-cat request.json | npx --yes @levack/s1s-mcp@latest noul
 
 # Show available options and the installed version.
 npx --yes @levack/s1s-mcp@latest --help

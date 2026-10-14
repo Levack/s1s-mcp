@@ -1,0 +1,12 @@
+{
+  "question": "Which area does this text belong to?",
+  "options": {
+    "auth": "Authentication and API keys",
+    "billing": "Invoices and payments",
+    "other": "Anything else"
+  },
+  "texts": [
+    {"id": "keys", "content": "Rotate API keys in the authentication settings."},
+    {"id": "invoice", "content": "Download past invoices from the billing page."}
+  ]
+}
